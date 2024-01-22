@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6 degrees of Kevin Bacon</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='difficulte.css') }}">
+</head>
+<body>
+    <header class="header">
+        <h1 class="title"><a href="{{ url_for('home') }}">Cinemaddict</a></h1>
+        <div class="rond"><h1 id="points" class="points">20</h1></div>
+    </header>
+    <h1 class="bienvenue">6 degrees of Kevin Bacon</h1>
+    <p id="diff" class="container">Vous avez choisi la difficulté {{ difficulte }} : les 2 acteurs que vous allez devoir relier sont connus.</p>
+    <h2 class="game-buttons"><a href="#" onclick="jeu(difficulte)" id="jeu">Commencez le jeu</a></h2>
+    <div id="infosacteurs" class="container-line" style="display: none">
+        <p id="act1" class="box"></p>
+        <div class="line1"></div>
+        <div id="indice-yes-no" style="display: none;" class="bell-icon box" onclick="afficherModalBox()">&#128276;</div>
+        <div id="indice-yes-no2" style="display: none;" class="bell-icon box" >?</div>
+        <div class="line2"></div>
+        <p id="act2" class="box"></p>
+        <div id="modal-box" class="modal-container">
+            <div id="indice-form" class="container2 modal-content game-buttons2" style="display: none;">
+                <p>Voulez-vous un indice ?</p>
+                <a href="#" onclick="verifierOptionIndice('oui')">Oui</a>
+                <a href="#" onclick="verifierOptionIndice('non')">Non</a>
+            </div>
+        </div>
+    </div>
+    <p></p>
+     <!-- Options d'indice cachées au début -->
+    <div id="modal-container" class="modal-container">
+        <div id="options-indice" class="container modal-content game-buttons2" style="display: none;">
+            <p>Choisissez l'acteur sur lequel vous souhaitez un indice :</p>
+            <a href="#" onclick="afficherOptionsIndiceAct1()"><span id="acteur1Span"></span></a><br>
+            <a href="#" onclick="afficherOptionsIndiceAct2()"><span id="acteur2Span"></span></a><br>
+        </div>
+        <div id="options-indiceAct1" class="container modal-content game-buttons2" style="display: none;">
+            <p>Choisissez l'indice :</p>
+            <a href="#" onclick="afficherCastingActeur1()">Connaitre le casting d'un film dans lequel <span id="acteur1Span"></span> a joué</a><br>
+            <a href="#" onclick="afficherFilmographieActeur1()">Connaitre la filmographie de <span id="acteur1Span"></span></a><br>
+        </div>
+        <div id="options-indiceAct2" class="container modal-content game-buttons2" style="display: none;">
+            <a href="#" onclick="afficherCastingActeur2()">Connaitre le casting d'un film dans lequel <span id="acteur2Span"></span> a joué</a><br>
+            <a href="#" onclick="afficherFilmographieActeur2()">Connaitre la filmographie de <span id="acteur2Span"></span></a><br>
+        </div>
+    </div>
+    <p id='indice' class="container" style="display:none;"></p>
+    <p>
+    <div id='tour1' class="container" style="display:none;">
+        <form id="acteurForm">
+            <label for="nomActeur">Entrez un acteur ayant joué avec <span id="acteur1Span"></span> ou <span id="acteur2Span"></span> : </label>
+            <p></p>
+            <div class="input-container">
+                <input type="text" id="nomActeur" name="nomActeur" required>
+                <div class="icon-container" onclick="saisirActeur()">Soumettre</div>
+            </div>
+        </form>
+        <p id='resultat-test'></p>
+        <p id='resultat-final'></p>
+        <button class="icon-container2" id='continuez' onclick="AllerAuJeu()" style="display:none;">Continuez</button>
+        <button class="icon-container2" id='terminer' onclick="TerminerLeJeu()" style="display:none;">Retournez au menu</button>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+        function randomIndex(weights) {
+            var totalWeight = weights.reduce((acc, weight) => acc + weight, 0);
+            var randomValue = Math.random() * totalWeight;
+            
+            for (var i = 0; i < weights.length; i++) {
+                randomValue -= weights[i];
+                if (randomValue <= 0) {
+                    return i;
+                }
+            }
+            
+            // En cas d'erreur, retournez le dernier index
+            return weights.length - 1;
+        }
+
+
+        var points
+        var acteur1
+        var acteur2
+
+        function jeu(difficulte) {
+            if (difficulte===1) {
+                difficulte1();
+            }
+
+            var infoActeursElement = document.getElementById('act1');
+            // Mettez à jour le contenu HTML avec les valeurs des variables
+            infoActeursElement.innerHTML = acteur1 ;
+
+            var infoActeursElement2 = document.getElementById('act2');
+            // Mettez à jour le contenu HTML avec les valeurs des variables
+            infoActeursElement2.innerHTML = acteur2 ;
+
+
+            var acteur1Spans = document.querySelectorAll('[id="acteur1Span"]');
+            // Mettez à jour le contenu de chaque élément
+            acteur1Spans.forEach(function(span) {
+                span.innerHTML = acteur1;
+            });
+            var acteur2Spans = document.querySelectorAll('[id="acteur2Span"]');
+            // Mettez à jour le contenu de chaque élément
+            acteur2Spans.forEach(function(span) {
+                span.innerHTML = acteur2;
+            });
+            points = 20;
+            afficherIndiceYesNo();
+            cacherOptionsIndice();
+            cacherIndice();
+            cacherJeu();
+            afficherTour1();
+            afficherInfosActeur();
+            changePoints();
+        }
+
+        function difficulte1() {
+            acteur1 = Acteurs_[randomIndex(nombre_de_films_des_acteurs_)];
+            acteur2 = acteur1;
+
+            // Sélection d'un autre acteur différent du premier
+            while (acteur2 === acteur1) {
+                acteur2 = Acteurs_[randomIndex(nombre_de_films_des_acteurs_)];
+            };
+        }
+
+        function changePoints() {
+            var optionsDiv = document.getElementById('points');
+            optionsDiv.innerHTML = points ;
+        }
+
+        function afficherModalBox() {
+            var modalContainer = document.getElementById('modal-box');
+            var optionsDiv = document.getElementById('indice-form');
+
+            modalContainer.style.display = 'flex';
+            optionsDiv.style.display = 'block';
+        }
+
+        function fermerModalBox() {
+            var modalContainer = document.getElementById('modal-box');
+            var optionsDiv = document.getElementById('indice-form');
+
+            modalContainer.style.display = 'none';
+            optionsDiv.style.display = 'none';
+        }
+
+
+        function cacherJeu() {
+            var optionsDiv = document.getElementById('jeu');
+            optionsDiv.style.display = "none";
+            var optionsP = document.getElementById('diff');
+            optionsP.style.display = "none";
+        }
+
+        function cacherIndiceYesNo() {
+            var optionsDiv = document.getElementById('indice-yes-no');
+            optionsDiv.style.display = "none";
+            afficherIndiceYesNo2();
+        }
+
+        function afficherIndiceYesNo() {
+            var optionsDiv = document.getElementById('indice-yes-no');
+            optionsDiv.style.display = "flex";
+        }
+
+        function afficherIndiceYesNo2() {
+            var optionsDiv = document.getElementById('indice-yes-no2');
+            optionsDiv.style.display = "flex";
+        }
+
+        function afficherOptionsIndice() {
+            var optionsDiv = document.getElementById('options-indice');
+            optionsDiv.style.display = 'flex';
+            cacherIndiceYesNo();
+        }
+
+        function afficherOptionsIndiceAct1() {
+            var optionsDiv = document.getElementById('options-indiceAct1');
+            optionsDiv.style.display = 'block';
+            cacherOptionsIndice();
+        }
+
+        function afficherOptionsIndiceAct2() {
+            var optionsDiv = document.getElementById('options-indiceAct2');
+            optionsDiv.style.display = 'block';
+            cacherOptionsIndice();
+        }
+
+        function cacherOptionsIndice() {
+            var optionsDiv = document.getElementById('options-indice');
+            optionsDiv.style.display = 'none';
+        }
+
+        function cacherIndice() {
+            var optionsDiv = document.getElementById('indice');
+            optionsDiv.style.display = 'none';
+        }
+
+        function afficherIndice() {
+            var optionsDiv = document.getElementById('indice');
+            optionsDiv.style.display = 'block';
+        }
+
+        function afficherTour1() {
+            var optionsDiv = document.getElementById('tour1');
+            optionsDiv.style.display = 'block';
+        }
+
+        function cacherTour1() {
+            var optionsDiv = document.getElementById('tour1');
+            optionsDiv.style.display = 'none';
+        }
+
+        function afficherContinuez() {
+            var optionsDiv = document.getElementById('continuez');
+            optionsDiv.style.display = 'block';
+        }
+
+        function afficherTerminer() {
+            var optionsDiv = document.getElementById('terminer');
+            optionsDiv.style.display = 'block';
+        }
+
+        function cacherActeurForm() {
+            var optionsDiv = document.getElementById('acteurForm');
+            optionsDiv.style.display = 'none';
+        }
+
+        function afficherActeurForm() {
+            var optionsDiv = document.getElementById('acteurForm');
+            optionsDiv.style.display = 'block';
+        }
+
+        function afficherInfosActeur() {
+            var optionsDiv = document.getElementById('infosacteurs');
+            optionsDiv.style.display = 'flex';
+        }
+
+        function afficherModal() {
+            var modalContainer = document.getElementById('modal-container');
+            var optionsIndice = document.getElementById('options-indice');
+
+            modalContainer.style.display = 'flex';
+            optionsIndice.style.display = 'block';
+        }
+
+        function fermerModal() {
+            var modalContainer = document.getElementById('modal-container');
+            var optionsIndice = document.getElementById('options-indice');
+
+            modalContainer.style.display = 'none';
+            optionsIndice.style.display = 'none';
+            afficherIndiceYesNo2();
+            cacherIndiceYesNo();
+        }
+
+        function verifierOptionIndice(choix) {
+            console.log('Fonction appelée avec choix :', choix);
+            if (choix === 'oui') {
+                afficherModal();
+                fermerModalBox();
+            }
+            else {
+                fermerModalBox();
+            }
+            
+        }
+
+        function afficherCastingActeur1() {
+            points = points - 1;
+            changePoints();
+            var filmographie = [];
+            // Filtrer les films dans lesquels l'acteur a joué
+            films.forEach(function(film) {
+                if (film.Actors.includes(acteur1)) {
+                    filmographie.push(film);
+                }
+            });
+            // Choisir aléatoirement un film parmi la filmographie
+            var film_random_casting = filmographie[Math.floor(Math.random() * filmographie.length)];
+            // Récupérer la liste des acteurs du casting choisi
+            var actorsString = film_random_casting.Actors.join(', ');
+            var title_film = film_random_casting.Title;
+            // Afficher la liste d'acteurs ayant joué avec acteur
+            afficherIndice();
+
+            var actorsList = actorsString.split(',');
+
+            // Récupérez l'élément du paragraphe
+            var indiceElement = document.getElementById('indice');
+
+            // Construisez le texte en colonne
+            var texteColonne = "Voici une liste d'acteurs ayant joué avec " + acteur1 + " dans " + title_film + " :<br>";
+
+            for (var i = 0; i < actorsList.length; i++) {
+                texteColonne += actorsList[i] + "<br>";
+            }
+
+            // Mettez à jour le contenu du paragraphe
+            indiceElement.innerHTML = texteColonne;
+            fermerModal();
+            afficherTour1();
+        }
+
+        function afficherCastingActeur2() {
+            points = points - 1;
+            changePoints();
+            var filmographie = [];
+            // Filtrer les films dans lesquels l'acteur a joué
+            films.forEach(function(film) {
+                if (film.Actors.includes(acteur2)) {
+                    filmographie.push(film);
+                }
+            });
+            // Choisir aléatoirement un film parmi la filmographie
+            var film_random_casting = filmographie[Math.floor(Math.random() * filmographie.length)];
+            // Récupérer la liste des acteurs du casting choisi
+            var actorsString = film_random_casting.Actors.join(', ');
+            var title_film = film_random_casting.Title;
+            // Afficher la liste d'acteurs ayant joué avec acteur
+            afficherIndice();
+            var actorsList = actorsString.split(',');
+
+            // Récupérez l'élément du paragraphe
+            var indiceElement = document.getElementById('indice');
+
+            // Construisez le texte en colonne
+            var texteColonne = "Voici une liste d'acteurs ayant joué avec " + acteur2 + " dans " + title_film + " :<br>";
+
+            for (var i = 0; i < actorsList.length; i++) {
+                texteColonne += actorsList[i] + "<br>";
+            }
+
+            // Mettez à jour le contenu du paragraphe
+            indiceElement.innerHTML = texteColonne;
+            fermerModal();
+            afficherTour1();
+        }
+
+
+        function afficherFilmographieActeur1() {
+            points = points - 3;
+            changePoints();
+            var filmographie =[]
+            films.forEach(function(film) {
+                if (film.Actors.includes(acteur1)) {
+                    filmographie.push(film.Title);
+                }
+            });
+            afficherIndice();
+
+            // Récupérez l'élément du paragraphe
+            var indiceElement = document.getElementById('indice');
+
+            // Construisez le texte en colonne
+            var texteColonne = "Voici les films dans lesquels " + acteur1 + " a joué : <br>";
+
+            for (var i = 0; i < filmographie.length; i++) {
+                texteColonne += filmographie[i] + "<br>";
+            }
+
+            // Mettez à jour le contenu du paragraphe
+            indiceElement.innerHTML = texteColonne;
+            fermerModal();
+            afficherTour1();
+        }
+
+
+        function afficherFilmographieActeur2() {
+            points = points - 3;
+            changePoints();
+            var filmographie =[]
+            films.forEach(function(film) {
+                if (film.Actors.includes(acteur2)) {
+                    filmographie.push(film.Title);
+                }
+            });
+            afficherIndice();
+            // Récupérez l'élément du paragraphe
+            var indiceElement = document.getElementById('indice');
+
+            // Construisez le texte en colonne
+            var texteColonne = "Voici les films dans lesquels " + acteur2 + " a joué : <br>";
+
+            for (var i = 0; i < filmographie.length; i++) {
+                texteColonne += filmographie[i] + "<br>";
+            }
+
+            // Mettez à jour le contenu du paragraphe
+            indiceElement.innerHTML = texteColonne;
+            fermerModal();
+            afficherTour1();
+        }
+        var title_of_film
+        function joueAvec(acteur1_, acteur2_) {
+            var joueAvec = false;
+
+            for (var i = 0; i < films.length; i++) {
+                var film = films[i];
+
+                if (film.Actors.includes(acteur1_) && film.Actors.includes(acteur2_)) {
+                    joueAvec = true;
+                    title_of_film = film.Title
+                    break;
+                }
+            }
+
+            return joueAvec;
+        }
+
+        var nomActeur
+        function saisirActeur() {
+            // Récupérer la valeur saisie par l'utilisateur
+            nomActeur = document.getElementById('nomActeur').value;
+
+            // Faire quelque chose avec la variable nomActeur (par exemple, l'afficher dans la console)
+            if (joueAvec(acteur1,nomActeur) === true) {
+                document.getElementById('resultat-test').innerHTML = nomActeur + " joue avec " + acteur1 + " dans " + title_of_film + " !"
+                if (joueAvec(acteur2,nomActeur) === true) {
+                    document.getElementById('resultat-final').innerHTML = nomActeur + " joue aussi avec " + acteur2 + " dans " + title_of_film + "! Vous avez gagné !"
+                    afficherTerminer();
+                    cacherActeurForm();
+                }
+                else {
+                    afficherContinuez();
+                    cacherActeurForm();
+                }
+            }
+            else if (joueAvec(acteur2,nomActeur) === true){
+                if (joueAvec(acteur1,nomActeur) === true) {
+                    document.getElementById('resultat-final').innerHTML = nomActeur + " joue aussi avec " + acteur2 + " dans " + title_of_film + "! Vous avez gagné !"
+                }
+                else {
+                    document.getElementById('resultat-test').innerHTML = nomActeur + " joue avec " + acteur2 + " dans " + title_of_film + " !"
+                    acteur2 = acteur1;
+                    afficherContinuez();
+                    cacherActeurForm();
+                }
+            }
+            else {
+                document.getElementById('resultat-test').innerHTML = nomActeur + " ne joue ni avec " + acteur1 + " ni avec " + acteur2 + ". Réessayez !"
+                nomActeur = acteur1;
+                afficherContinuez();
+                cacherActeurForm();
+            }
+        }
+
+        function AllerAuJeu() {
+            points = points - 1;
+            changePoints();
+            var url = "jeu.html?nomActeur=" + encodeURIComponent(nomActeur) + "&acteur2=" + encodeURIComponent(acteur2) + "&points=" + encodeURIComponent(points) ;
+
+            window.location.href = url;
+        }
+
+        function TerminerLeJeu() {
+            var url = "home.html";
+
+            window.location.href = url;
+        }
+    </script>
+    <script>
+        // Utilisez la variable films directement dans votre script
+        var films = {{ films | tojson }};
+        var Acteurs_ = {{ Acteurs_ | tojson }};
+        var nombre_de_films_des_acteurs_ = {{ nombre_de_films_des_acteurs_ | tojson }};
+        var difficulte = {{ difficulte | tojson }}
+    </script>
+</body>
+</html>

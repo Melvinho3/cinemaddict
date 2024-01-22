@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choix de la Difficulté</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='choix_difficulte.css') }}">
+</head>
+<body>
+    <header class="header">
+        <h1 class="title"><a href="{{ url_for('home') }}">Cinemaddict</a></h1>
+    </header>
+    <p></p>
+    <h1 class="bienvenue">Bienvenue dans le Six degrees of Kevin Bacon</h1>
+    <div class="container">
+        <p>Le Six Degrees of Kevin Bacon consiste à relier tout acteur à Kevin Bacon en six étapes ou moins, en utilisant des acteurs ayant joué ensemble jusqu'à en trouver un ayant joué avec Kevin Bacon. </p>
+
+        <p>Dans cette variante, le but est de relier deux acteurs entre eux, pas forcément avec Kevin Bacon.</p>
+
+        <p>Plus vous utilisez de tours : moins vous gagnez de points. Vous pouvez échanger des points contre des indices, ils peuvent vous tirer d'affaire lorsque vous êtes bloqués, mais aussi vous suggérer des chemins plus rapides et gagner donc plus de points.</p>
+    </div>
+    <div class="difficulte-buttons">
+        <h2>Choisissez la difficulté : </h2>
+        <a href="{{ url_for('difficulte1') }}">Difficulté 1 </a>
+        <a href="{{ url_for('difficulte2') }}">Difficulté 2 </a>
+        <a href="{{ url_for('difficulte3') }}">Difficulté 3 </a>
+    </div>
+</body>
+</html>

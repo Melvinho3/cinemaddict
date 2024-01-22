@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choix du Jeu</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css') }}">
+</head>
+<body>
+    <header class="header">
+        <h1 class="title"><a href="{{ url_for('home') }}">Cinemaddict</a></h1>
+    </header>
+    <p></p>
+    <p></p>
+    <p class="container">Cinemaddict vous propose divers jeux sur le cinéma, amusez-vous tout en apprenant sur votre passion !</p>
+    <div class="game-buttons">
+        <h2>Choisissez le jeu</h2>
+        <a href="{{ url_for('choix_difficulte', choix_jeu=1) }}">6 Degrees of Kevin Bacon</a>
+        <a href="{{ url_for('choix_difficulte', choix_jeu=2) }}">Trouve le film</a>
+        <a href="{{ url_for('choix_difficulte', choix_jeu=3) }}">Trouve l'acteur</a>
+    </div>
+</body>
+</html>
